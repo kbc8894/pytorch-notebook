@@ -6,7 +6,7 @@ on:
 
 jobs:
   pytorch-notebook-cpu:
-    runs-on: self-hosted
+    runs-on: [self-hosted, pytorch-notebook]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
