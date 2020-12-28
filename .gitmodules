@@ -1,0 +1,4 @@
+[submodule "docker-stacks"]
+	path = docker-stacks
+	url = https://github.com/jupyter/docker-stacks.git
+	branch = master
