@@ -29,5 +29,5 @@ jobs:
           push: false
           context: .
           file: ./Dockerfile
-          tags: ghcr.io/kbc8894/pytorch-notebook:cpu-${GITHUB_SHA::8}
+          tags: ghcr.io/kbc8894/pytorch-notebook:cpu-${{ GITHUB_SHA::8 }}
           no-cache: true
