@@ -12,6 +12,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+      - name: Create shot SHA
+        uses: benjlevesque/short-sha@v1.2
+        id: short-sha
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -29,5 +32,5 @@ jobs:
           push: false
           context: .
           file: ./Dockerfile
-          tags: ghcr.io/kbc8894/pytorch-notebook:cpu-${{ GITHUB_SHA::8 }}
+          tags: ghcr.io/kbc8894/pytorch-notebook:cpu-${{ steps.short-sha.outputs.sha }}
           no-cache: true
