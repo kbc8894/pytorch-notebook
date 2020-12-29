@@ -15,17 +15,14 @@ jobs:
       - name: Create shot SHA
         uses: benjlevesque/short-sha@v1.2
         id: short-sha
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
-
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
@@ -34,3 +31,59 @@ jobs:
           file: ./Dockerfile
           tags: ghcr.io/kbc8894/pytorch-notebook:cpu-${{ steps.short-sha.outputs.sha }}
           no-cache: true
+
+  pytorch-notebook-gpu:
+    runs-on: [self-hosted, pytorch-notebook]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Create shot SHA
+        uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Build base-notebook:gpu
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker-stacks/base-notebook
+          file: ./docker-stacks/base-notebook/Dockerfile
+          tags: ghcr.io/kbc8894/base-notebook:gpu
+          no-cache: true
+          build-args: |
+            ROOT_CONTAINER=nvidia/cuda:11.1-cudnn8-runtime-ubuntu18.04
+      - name: Build minimal-notebook:gpu
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker-stacks/minimal-notebook
+          file: ./docker-stacks/minimal-notebook/Dockerfile
+          tags: ghcr.io/kbc8894/minimal-notebook:gpu
+          no-cache: true
+          build-args: |
+            BASE_CONTAINER=ghcr.io/kbc8894/base-notebook:gpu
+      - name: Build scipy-notebook:gpu
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker-stacks/scipy-notebook
+          file: ./docker-stacks/scipy-notebook/Dockerfile
+          tags: ghcr.io/kbc8894/scipy-notebook:gpu
+          no-cache: true
+          build-args: |
+            BASE_CONTAINER=ghcr.io/kbc8894/minimal-notebook:gpu
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          context: .
+          file: ./Dockerfile.gpu
+          tags: ghcr.io/kbc8894/pytorch-notebook:gpu-${{ steps.short-sha.outputs.sha }}
+          no-cache: true
+          build-args: |
+            BASE_CONTAINER=ghcr.io/kbc8894/scipy-notebook:gpu
