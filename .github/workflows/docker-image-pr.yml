@@ -31,7 +31,7 @@ jobs:
           file: ./Dockerfile
           tags: ghcr.io/kbc8894/pytorch-notebook:cpu-${{ steps.short-sha.outputs.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
 
   pytorch-notebook-gpu:
     runs-on: [self-hosted, pytorch-notebook]
@@ -59,7 +59,7 @@ jobs:
           file: ./docker-stacks/base-notebook/Dockerfile
           tags: ghcr.io/kbc8894/base-notebook:gpu-${{ steps.short-sha.outputs.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
             ROOT_CONTAINER=nvidia/cuda:11.1-cudnn8-runtime-ubuntu18.04
       - name: Build minimal-notebook:gpu
@@ -70,7 +70,7 @@ jobs:
           file: ./docker-stacks/minimal-notebook/Dockerfile
           tags: ghcr.io/kbc8894/minimal-notebook:gpu-${{ steps.short-sha.outputs.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
             BASE_CONTAINER=ghcr.io/kbc8894/base-notebook:gpu-${{ steps.short-sha.outputs.sha }}
       - name: Build scipy-notebook:gpu
@@ -81,7 +81,7 @@ jobs:
           file: ./docker-stacks/scipy-notebook/Dockerfile
           tags: ghcr.io/kbc8894/scipy-notebook:gpu-${{ steps.short-sha.outputs.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
             BASE_CONTAINER=ghcr.io/kbc8894/minimal-notebook:gpu-${{ steps.short-sha.outputs.sha }}
       - name: Build and push
@@ -92,6 +92,6 @@ jobs:
           file: ./Dockerfile.gpu
           tags: ghcr.io/kbc8894/pytorch-notebook:gpu-${{ steps.short-sha.outputs.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
             BASE_CONTAINER=ghcr.io/kbc8894/scipy-notebook:gpu-${{ steps.short-sha.outputs.sha }}
