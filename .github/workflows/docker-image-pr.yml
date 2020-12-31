@@ -95,3 +95,42 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
             BASE_CONTAINER=ghcr.io/kbc8894/scipy-notebook:gpu-${{ steps.short-sha.outputs.sha }}
+
+  pytorch-notebook-cpu-kubeflow:
+    runs-on: [self-hosted, pytorch-notebook]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Create shot SHA
+        uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Build pytorch-notebook:cpu
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          file: ./Dockerfile
+          tags: ghcr.io/kbc8894/pytorch-notebook:cpu-${{ steps.short-sha.outputs.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          file: ./Dockerfile.kubeflow
+          tags: ghcr.io/kbc8894/pytorch-notebook:cpu-kubeflow-${{ steps.short-sha.outputs.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          build-args: |
+            BASE_CONTAINER=ghcr.io/kbc8894/pytorch-notebook:cpu-${{ steps.short-sha.outputs.sha }}
