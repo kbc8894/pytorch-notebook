@@ -39,6 +39,8 @@ jobs:
           context: .
           file: ./Dockerfile.kubeflow
           tags: |
+            ghcr.io/kbc8894/pytorch-notebook:kubeflow
+            ghcr.io/kbc8894/pytorch-notebook:kubeflow-latest
             ghcr.io/kbc8894/pytorch-notebook:cpu-kubeflow
             ghcr.io/kbc8894/pytorch-notebook:cpu-kubeflow-latest
           cache-from: type=local,src=/tmp/.buildx-cache
